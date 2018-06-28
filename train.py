@@ -18,7 +18,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Trains new network on image dataset and saves network to checkpoint')
 parser.add_argument('data_dir')
 parser.add_argument('-s', '--save_dir', help='Save model checkpoints in given directory')
-parser.add_argument('-a','--arch', help='Choose pre-trained model architecture', type=str, default='vgg19')
+parser.add_argument('-a','--arch', help='Choose pre-trained VGG model architecture', type=str, default='vgg19')
 parser.add_argument('-lr', '--learning_rate', help='Set learning learning rate', type=int, default=0.001)
 parser.add_argument('-hu', '--hidden_units', help='Set number of hidden units', type=int, default=2500)
 parser.add_argument('-e', '--epochs', help='Set number of epochs', type=int, default=3)
@@ -51,7 +51,14 @@ device = torch.device("cuda:0" if args.gpu is True else "cpu")
 train_dataset, valid_dataset, trainloader, validloader = load_data(data_dir)
 
 # load a pretrained network
-model = models.arch(pretrained=True)
+if arch == "vgg16":
+    model = models.vgg16(pretrained=True)
+if arch == "vgg13":
+    model = models.vgg13(pretrained=True)
+if arch == "vgg11":
+    model = models.vgg11(pretrained=True)
+if arch == "vgg19" or arch == None:
+    model = models.vgg19(pretrained=True)
 
 # freeze parameters to prevent backpropagation with them
 for param in model.parameters():
