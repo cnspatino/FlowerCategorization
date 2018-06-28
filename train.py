@@ -1,6 +1,21 @@
+"""
+This script will train a new network on a given dataset of images using transfer learning
+with a pre-trained model. It will then save the newly trained model as a checkpoint.
+
+Input: data directory with image data sets (train and validation sets in separate folders)
+Optional inputs:    - save directory (if different from data directory)
+                    - pre-trained model architecture (default is vgg19)
+                    - learning rate (default is 0.001)
+                    - number of units in hidden layer (default is 2500)
+                    - number of epochs (default is 3)
+                    - whether to train on gpu (defailt is cpu)
+
+"""
+
+# set up command line inputs
 import argparse
 
-parser = argparse.ArgumentParser(description='Trains a new network on a dataset')
+parser = argparse.ArgumentParser(description='Trains new network on image dataset and saves network to checkpoint')
 parser.add_argument('data_dir')
 parser.add_argument('-s', '--save_dir', help='Save model checkpoints in given directory')
 parser.add_argument('-a','--arch', help='Choose pre-trained model architecture', type=str, default='vgg19')

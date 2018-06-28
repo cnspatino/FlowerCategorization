@@ -1,10 +1,25 @@
+"""
+This script loads a trained network from a checkpoint file and uses the model to 
+predict the class for an input image. It returns the predicted class along with 
+the class probability.
+
+Inputs: - filepath to single image
+        - checkpoint filepath for trained network
+
+Optional inputs:    - topk, returns the top K most likely classes instead of just the top one (default=5)
+                    - map to category names, maps classes to flower names
+                    - whether to train on gpu (default is cpu)
+
+"""
+
+# set up command line inputs
 import argparse
 
 parser = argparse.ArgumentParser(description='Predicts flower name from an image')
 parser.add_argument('image_path')
 parser.add_argument('checkpoint')
 parser.add_argument('-tk', '--topk', help='Return top K most likely classes', type=int, default=5)
-parser.add_argument('-c', '--category_names', help='Map categories to real names', type=str)
+parser.add_argument('-c', '--category_names', help='Map classes to flower names', type=str)
 parser.add_argument('g', '--gpu', help='Use GPU for inference instead of CPU', action='store_true')
 args = vars(parser.parse_args())
 
