@@ -3,24 +3,24 @@ This script loads a trained network from a checkpoint file and uses the model to
 predict the class for an input image. It returns the predicted class along with 
 the class probability.
 
-Inputs: - filepath to single image
-        - checkpoint filepath for trained network
+Required Inputs:    - image_path: type str, filepath to single image
+                    - checkpoint: type str, checkpoint filepath for trained network
 
-Optional inputs:    - topk, returns the top K most likely classes instead of just the top one (default=5)
-                    - map to category names, maps classes to flower names
-                    - whether to train on gpu (default is cpu)
+Optional inputs:    - topk: type int, returns the top K most likely classes (default is 1)
+                    - category_names: type str, json file to map classes to real names
+                    - gpu: whether to train on gpu (default is cpu)
 
 """
 
 # set up command line inputs
 import argparse
 
-parser = argparse.ArgumentParser(description='Predicts flower name from an image')
-parser.add_argument('image_path')
-parser.add_argument('checkpoint')
-parser.add_argument('-tk', '--topk', help='Return top K most likely classes', type=int, default=5)
-parser.add_argument('-c', '--category_names', help='Map classes to flower names', type=str)
-parser.add_argument('g', '--gpu', help='Use GPU for inference instead of CPU', action='store_true')
+parser = argparse.ArgumentParser(description='Predicts class or name for an input image')
+parser.add_argument('image_path', type=str)
+parser.add_argument('checkpoint', type=str)
+parser.add_argument('--topk', help='Return top K most likely classes', type=int, default=1)
+parser.add_argument('--category_names', help='Map classes to real names', type=str)
+parser.add_argument('--gpu', help='Use GPU for inference instead of CPU', action='store_true')
 args = vars(parser.parse_args())
 
 # import other packages
@@ -29,7 +29,6 @@ import random
 import torch
 from torch import nn
 from torch import optim
-import torch.nn.functional as F
 from torchvision import datasets, transforms, models
 import json
 
@@ -42,11 +41,11 @@ from collections import OrderedDict
 from PIL import Image
     
 # set input args to variables
-image_path = args.image_path
-checkpoint = args.checkpoint
-topk = args.topk
-category_map = args.category_names
-device = torch.device("cuda:0" if args.gpu is True else "cpu")
+image_path = args['image_path']
+checkpoint = args['checkpoint']
+topk = args['topk']
+category_map = args['category_names']
+device = torch.device("cuda:0" if args['gpu'] is True else "cpu")
 
 model = load_checkpoint(checkpoint)
     
@@ -84,30 +83,14 @@ for i in indices:
 
 topk_probs = probs.cpu().numpy()[0]
 
-# get top prediction probablity
-prediction_prob = topk_probs[0]
-
-# get top prediction class or name
-if args.category_names is None:
-    prediction = topk_predictions[0]
-else:
+# get prediction names from classes if category map provided
+if args['category_names'] is not None:
     with open(category_map, 'r') as f:
         cat_to_name = json.load(f)
-    
-    names = []
-    for c in classes:
-        names.append(cat_to_name[c])
-    
+        names = []
+        for c in topk_predictions:
+            names.append(cat_to_name[c])
     topk_predictions = names
-    prediction = topk_predictions[0]
 
-if topk is None:
-   print(prediction)
-   print(prediction_prob)
-   return prediction, prediction_prob
-       
-else:
-    print(topk_predictions)
-    print(topk_probs)
-    return topk_predictions, topk_probs
-
+print(topk_predictions)
+print(topk_probs)
