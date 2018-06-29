@@ -1,7 +1,13 @@
+# import packages
+import numpy as np
+import torch
+from torchvision import datasets, transforms
+from PIL import Image
+
 def load_data(data_dir):
     """
-    This function loads a data directory and performs the necessary transforms to produce a 
-    dataloader for the training and validation sets.
+    Loads datasets from the given data directory and performs the necessary transforms to produce
+    dataloaders for the training and validation sets.
     
     Input: data directory that contains a 'train' and 'valid' folder with png images like follows:
                 training set: data_dir/train/sample.png
@@ -11,7 +17,7 @@ def load_data(data_dir):
     train_dir = data_dir + '/train'
     valid_dir = data_dir + '/valid'
 
-    # definite transforms for training and validation sets
+    # define transforms for training and validation sets
     train_transforms = transforms.Compose([transforms.RandomResizedCrop(224),
                                        transforms.RandomRotation(40),
                                        transforms.RandomHorizontalFlip(),
@@ -20,7 +26,7 @@ def load_data(data_dir):
                                                             [0.229,0.224,0.225])
                                       ])
 
-    valid__transforms = transforms.Compose([transforms.Resize(255),
+    valid_transforms = transforms.Compose([transforms.Resize(255),
                                       transforms.CenterCrop(224),
                                       transforms.ToTensor(),
                                       transforms.Normalize([0.485, 0.456, 0.406],
@@ -29,7 +35,7 @@ def load_data(data_dir):
 
     # load the datasets using ImageFolder
     train_dataset = datasets.ImageFolder(root = train_dir, transform = train_transforms)
-    valid_dataset = datasets.ImageFolder(root = valid_dir, transform = valid_test_transforms)
+    valid_dataset = datasets.ImageFolder(root = valid_dir, transform = valid_transforms)
 
     # define the dataloaders using the image datasets and transforms
     trainloader = torch.utils.data.DataLoader(train_dataset, batch_size = 50, shuffle=True)
@@ -40,7 +46,7 @@ def load_data(data_dir):
 
 def process_image(image):
     ''' Scales, crops, and normalizes a PIL image for a PyTorch model.
-        Returns a Numpy array.
+        Returns a Numpy array of image.
     '''
     
     # load image and get size
@@ -74,4 +80,3 @@ def process_image(image):
     processed_image = np_image.transpose((2,0,1))
 
     return processed_image
-
