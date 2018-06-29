@@ -1,10 +1,18 @@
+# import packages
+import torch
+from torch import nn
+from torch import optim
+from torchvision import models
+from collections import OrderedDict
+
+
 def validation(model, criterion, dataloader):
     """
-    This function takes in a model, criterion, and validation dataloader as inputs 
+    Takes in a model, criterion, and validation dataloader as inputs 
     and calculates the loss and accuracy on the validation set.
 
     Inputs: model, criterion, dataloader
-    Returns: valid_loss, accuracy
+    Outputs: valid_loss, accuracy
     """
     valid_loss = 0
     accuracy = 0
@@ -30,25 +38,46 @@ def validation(model, criterion, dataloader):
     return valid_loss, accuracy
 
 
-def save_checkpoint(state, filepath):
+def save_checkpoint(model, arch, optimizer, epochs, input_size, output_size, hidden_units, filename):
     """
-    Saves model state as checkpoint under given filename.
+    Saves model state and architecture to checkpoint under given filename.
     """
-    torch.save(state, filename)
+    checkpoint = {'input_size': input_size,
+                  'output_size': output_size,
+                  'hidden_layer': hidden_units,
+                  'state_dict': model.state_dict(),
+                  'optimizer': optimizer.state_dict(),
+                  'epochs': epochs,
+                  'class_to_idx': model.class_to_idx,
+                  'arch': arch
+                 }
+
+    torch.save(checkpoint, filename)
 
 
 def load_checkpoint(filepath):
     """
-    Loads checkpoint from given filepath and sets new model to the checkpoint states.
+    Loads checkpoint from given filepath and sets new model to the checkpoint states and architecture.
     Returns the model.
     """
     checkpoint = torch.load(filepath)
-    model = models.vgg19(pretrained=True)
+    arch = checkpoint['arch']
+    
+    # load a pretrained network
+    if arch == "vgg16":
+        model = models.vgg16(pretrained=True)
+    if arch == "vgg13":
+        model = models.vgg13(pretrained=True)
+    if arch == "vgg11":
+        model = models.vgg11(pretrained=True)
+    if arch == "vgg19" or arch == None:
+        model = models.vgg19(pretrained=True)
     
     input_size = checkpoint['input_size']
     hidden_size = checkpoint['hidden_layer']
     output_size = checkpoint['output_size']
 
+    # build new classifier
     classifier = nn.Sequential(OrderedDict([('fc1', nn.Linear(input_size, hidden_size)),
                                             ('relu1', nn.ReLU()),
                                             ('dropout1', nn.Dropout(p=0.5)),
@@ -56,9 +85,11 @@ def load_checkpoint(filepath):
                                             ('logSoftmax', nn.LogSoftmax(dim=1))
                                            ]))
     
+    # replace model classifier with new classifier
     model.classifier = classifier
     model.load_state_dict(checkpoint['state_dict'])
     
+    # load optimizer
     optimizer = optim.Adam(model.classifier.parameters(), lr=0.001)
     optimizer.load_state_dict(checkpoint['optimizer'])
     
@@ -77,8 +108,3 @@ def new_classifier(input_size, hidden_size, output_size):
                                             ('logSoftmax', nn.LogSoftmax(dim=1))
                                           ]))
     return classifier
-
-
-
-
-
