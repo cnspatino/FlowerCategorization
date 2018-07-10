@@ -6,7 +6,7 @@ Required input:     - data_dir: data directory with image data sets (train and v
                       root/train and root/valid)
 
 Optional inputs:    - save_dir: directory in which to save the model checkpoint after training (default is data directory)
-                    - arch: pre-trained model architecture (default is vgg19)
+                    - arch: pre-trained model architecture of vgg or densenet (default is vgg19)
                     - learning_rate: type float, learning rate for optimizer (default is 0.001)
                     - hidden_units: type int, number of units in hidden layer (default is 2500)
                     - epochs: type int, number of epochs for training (default is 3)
@@ -19,7 +19,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Trains new network on image dataset and saves network to checkpoint')
 parser.add_argument('data_dir', type=str)
 parser.add_argument('--save_dir', help='Save model checkpoints in given directory', type=str)
-parser.add_argument('--arch', help='Choose pre-trained VGG model architecture', type=str, default='vgg19')
+parser.add_argument('--arch', help='Choose pre-trained model architecture of VGG or Densenet', type=str, default='vgg19')
 parser.add_argument('--learning_rate', help='Set learning learning rate', type=float, default=0.001)
 parser.add_argument('--hidden_units', help='Set number of hidden units', type=int, default=2500)
 parser.add_argument('--epochs', help='Set number of epochs', type=int, default=3)
@@ -51,24 +51,22 @@ device = torch.device("cuda:0" if args['gpu'] is True else "cpu")
 train_dataset, valid_dataset, trainloader, validloader = load_data(data_dir)
 
 # load a pretrained network
-if arch == "vgg16":
-    model = models.vgg16(pretrained=True)
-if arch == "vgg13":
-    model = models.vgg13(pretrained=True)
-if arch == "vgg11":
-    model = models.vgg11(pretrained=True)
-if arch == "vgg19" or arch == None:
-    model = models.vgg19(pretrained=True)
+model_function = getattr(models, arch) 
+model = model_function(pretrained=True)
 
 # freeze parameters to prevent backpropagation with them
 for param in model.parameters():
     param.requires_grad = False
 
 # define new classifier to replace current model classifier
-input_size = 25088
+if arch.startswith('vgg'):
+    input_size = model.classifier[0].in_features
+if arch.startswith('densenet'):
+    input_size = model.classifier.in_features
+hidden_size = hidden_units
 output_size = 102
 
-model.classifier = new_classifier(input_size, hidden_units, output_size)
+model.classifier = new_classifier(input_size, hidden_size, output_size)
 
 # set criterion and optimizer
 criterion = nn.NLLLoss()

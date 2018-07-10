@@ -64,14 +64,8 @@ def load_checkpoint(filepath):
     arch = checkpoint['arch']
     
     # load a pretrained network
-    if arch == "vgg16":
-        model = models.vgg16(pretrained=True)
-    if arch == "vgg13":
-        model = models.vgg13(pretrained=True)
-    if arch == "vgg11":
-        model = models.vgg11(pretrained=True)
-    if arch == "vgg19" or arch == None:
-        model = models.vgg19(pretrained=True)
+    model_function = getattr(models, arch) 
+    model = model_function(pretrained=True)
     
     input_size = checkpoint['input_size']
     hidden_size = checkpoint['hidden_layer']
