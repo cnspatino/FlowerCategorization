@@ -1,9 +1,9 @@
 # FlowerCategorization
 Command line programs for using pre-trained neural networks to predict flower types with PyTorch.
 
-train.py:
+- train.py:
 This script will train a new neural network on a given dataset of images using transfer learning
-with a pre-trained model (https://pytorch.org/docs/stable/torchvision/models.html). It will then save the newly trained model as a checkpoint.
+with a [pre-trained model](https://pytorch.org/docs/stable/torchvision/models.html). It will then save the newly trained model as a checkpoint.
 
 Required input:     - data_dir: data directory with image data sets (train and validation sets in separate folders,
                       root/train and root/valid)
@@ -15,7 +15,7 @@ Optional inputs:    - save_dir: directory in which to save the model checkpoint 
                     - epochs: type int, number of epochs for training (default is 3)
                     - gpu: whether to train on gpu (defailt is cpu)
                     
-predict.py:
+- predict.py:
 This script loads a trained network from a checkpoint file and uses the model to 
 predict the class for an input image. It returns the predicted class or category along with 
 the probability.
@@ -27,7 +27,7 @@ Optional inputs:    - topk: type int, returns the top K most likely classes (def
                     - category_names: type str, json file to map classes to real names
                     - gpu: whether to train on gpu (default is cpu)
                     
-model_functions.py:
+- model_functions.py:
 Contains functions related to the model.
     - validation function: Takes in model, criterion, and validation dataloader as inputs 
       and calculates the loss and accuracy on the validation set.
@@ -36,7 +36,7 @@ Contains functions related to the model.
       architecture.
     - new_classifier function: Creates new classifier with one hidden layer and an output given by a logSoftmax function
 
-utils_functions.py:
+- utils_functions.py:
 Contains utility functions for loading data and preprocessing images.
     - load_data function: Loads datasets from the given data directory and performs the necessary transforms to produce
       dataloaders for the training and validation sets.
