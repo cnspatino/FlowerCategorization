@@ -1,5 +1,5 @@
-# FlowerCategorization
-Command line programs for using pre-trained neural networks to predict flower types with PyTorch.
+# ImageClassification-neural-network
+Command line programs that train an image classifier on a dataset using deep learning with PyTorch and predict the labels of new images using the trained model. 
 
 - train.py: This script will train a new neural network on a given dataset of images using transfer learning
 with a [pre-trained model](https://pytorch.org/docs/stable/torchvision/models.html). It will then save the newly trained model as a checkpoint.
